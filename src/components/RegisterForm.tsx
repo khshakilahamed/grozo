@@ -18,6 +18,7 @@ import Image from "next/image";
 import axios from "axios";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type propType = {
   previousStep: (step: number) => void;
@@ -29,6 +30,7 @@ const RegisterForm = ({ previousStep }: propType) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ const RegisterForm = ({ previousStep }: propType) => {
         password,
       });
 
-      console.log(result.data);
+      router.push("/login");
     } catch (error) {
       console.log(error);
     } finally {
@@ -142,13 +144,19 @@ const RegisterForm = ({ previousStep }: propType) => {
           <span className="flex-1 h-px bg-gray-200"></span>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200" onClick={()=> signIn('google')}>
+        <div
+          className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200"
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+        >
           <Image src={googleImage} width={20} height={20} alt="google logo" />{" "}
           Continue with Google
-        </button>
+        </div>
       </motion.form>
 
-      <Link href={"/login"} className="cursor-pointer text-gray-600 mt-6 text-sm flex items-center gap-1">
+      <Link
+        href={"/login"}
+        className="cursor-pointer text-gray-600 mt-6 text-sm flex items-center gap-1"
+      >
         Already have an account ? <LogIn className="w-4 h-4" />{" "}
         <span className="text-green-600">Sign in</span>
       </Link>
