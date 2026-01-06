@@ -32,7 +32,7 @@ const Nav = ({ user }: { user: IUser }) => {
             0
           </span>
         </Link>
-        <div className="bg-white rounded-full w-11 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition-transform">
+        <div className="bg-white rounded-full w-11 h-11 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition-transform relative">
           {user?.image ? (
             <Image
               src={user?.image}
