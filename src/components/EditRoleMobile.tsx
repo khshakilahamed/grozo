@@ -2,7 +2,8 @@
 import axios from "axios";
 import { ArrowRight, Bike, User, UserCog } from "lucide-react";
 import { motion } from "motion/react";
-import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const EditRoleMobile = () => {
@@ -13,6 +14,9 @@ const EditRoleMobile = () => {
   ]);
   const [selectedRole, setSelectedRole] = useState("");
   const [mobile, setMobile] = useState("");
+  const router = useRouter();
+
+  const { update } = useSession();
 
   const handleEdit = async () => {
     try {
@@ -21,8 +25,10 @@ const EditRoleMobile = () => {
         mobile: mobile,
       });
 
+      await update({ role: selectedRole });
+
       // console.log(result.data);
-      redirect("/");
+      router.push("/");
     } catch (error) {
       console.log(error);
     }
@@ -48,11 +54,10 @@ const EditRoleMobile = () => {
               key={role.id}
               whileTap={{ scale: 0.94 }}
               onClick={() => setSelectedRole(role.id)}
-              className={`flex flex-col items-center justify-center w-48 h-44 rounded-2xl border-2 transition-all ${
-                isSelected
-                  ? "border-green-600 bg-green-100 shadow-lg"
-                  : "border-gray-300 bg-white hover:border-green-400"
-              }`}
+              className={`flex flex-col items-center justify-center w-48 h-44 rounded-2xl border-2 transition-all ${isSelected
+                ? "border-green-600 bg-green-100 shadow-lg"
+                : "border-gray-300 bg-white hover:border-green-400"
+                }`}
             >
               <Icon />
               <span>{role.label}</span>
@@ -81,11 +86,10 @@ const EditRoleMobile = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           disabled={!(selectedRole && mobile.length === 11)}
-          className={`flex items-center justify-center gap-2 font-semibold py-3 px-8 rounded-2xl shadow-md transition-all duration-200 w-50 mt-20 ${
-            selectedRole && mobile.length === 11
-              ? "bg-green-600 hover:bg-green-700 text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`flex items-center justify-center gap-2 font-semibold py-3 px-8 rounded-2xl shadow-md transition-all duration-200 w-50 mt-20 ${selectedRole && mobile.length === 11
+            ? "bg-green-600 hover:bg-green-700 text-white"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           onClick={handleEdit}
         >
           Go to Home
