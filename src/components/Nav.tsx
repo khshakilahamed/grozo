@@ -1,7 +1,7 @@
 "use client";
 
 import { IUser } from "@/models/user.model";
-import { Cross, LogOut, Package, Search, ShoppingCart, User, X } from "lucide-react";
+import { Boxes, ClipboardCheck, LogOut, Package, PlusCircle, Search, ShoppingCart, User, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -38,33 +38,71 @@ const Nav = ({ user }: { user: IUser }) => {
       </Link>
 
       {/* search for large screen */}
-      <form className="hidden md:flex items-center bg-white rounded-full px-4 py-2 w-1/2 max-w-lg shadow-md">
-        <Search className="text-gray-500 w-5 h-5 mr-2" />
-        <input
-          type="text"
-          placeholder="Search groceries..."
-          className="w-full outline-none text-gray-700 placeholder-gray-400"
-        />
-      </form>
+      {
+        user.role === "user" &&
+        <form className="hidden md:flex items-center bg-white rounded-full px-4 py-2 w-1/2 max-w-lg shadow-md">
+          <Search className="text-gray-500 w-5 h-5 mr-2" />
+          <input
+            type="text"
+            placeholder="Search groceries..."
+            className="w-full outline-none text-gray-700 placeholder-gray-400"
+          />
+        </form>
+      }
 
       <div className="flex items-center gap-3 md:gap-6 relative">
-        {/* Search mobile screen */}
-        <div
-          className="bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition md:hidden"
-          onClick={() => setSearchBarOpen((prev) => !prev)}>
-          <Search className="text-green-600 w-6 h-6" />
-        </div>
+        {/* search bar mobile screen & cart for user role */}
+        {
+          user.role === "user" && <>
+            {/* Search mobile screen */}
+            <div
+              className="bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition md:hidden"
+              onClick={() => setSearchBarOpen((prev) => !prev)}>
+              <Search className="text-green-600 w-6 h-6" />
+            </div>
 
-        {/* Cart */}
-        <Link
-          href="/cart"
-          className="relative bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition"
-        >
-          <ShoppingCart className="text-green-600 w-6 h-6" />
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
-            0
-          </span>
-        </Link>
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className="relative bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition"
+            >
+              <ShoppingCart className="text-green-600 w-6 h-6" />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
+                0
+              </span>
+            </Link>
+          </>
+        }
+
+        {
+          user.role === "admin" && <>
+            <div className="hidden md:flex items-center gap-3">
+              <Link
+                href="/"
+                className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
+              >
+                <PlusCircle className="w-5 h-5" />
+                Add Grocery
+              </Link>
+              <Link
+                href="/"
+                className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
+              >
+                <Boxes className="w-5 h-5" />
+                View Grocery
+              </Link>
+              <Link
+                href="/"
+                className="flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition-all"
+              >
+                <ClipboardCheck className="w-5 h-5" />
+                Manage Orders
+              </Link>
+            </div>
+          </>
+        }
+
+
         {/* User Icon & dropdown */}
         <div className="relative" ref={profileDropDown}>
           <div
@@ -114,13 +152,15 @@ const Nav = ({ user }: { user: IUser }) => {
                     </div>
                   </div>
                 </div>
-                <Link
-                  href={"/my-order"}
-                  className="flex items-center gap-2 px-3 py-3 hover:bg-green50 rounded-lg text-gray-700 font-medium"
-                  onClick={() => setOpen(false)}
-                >
-                  <Package className="w-5 h-5 text-green-600" /> My Order
-                </Link>
+                {
+                  user.role === "user" && <Link
+                    href={"/my-order"}
+                    className="flex items-center gap-2 px-3 py-3 hover:bg-green50 rounded-lg text-gray-700 font-medium"
+                    onClick={() => setOpen(false)}
+                  >
+                    <Package className="w-5 h-5 text-green-600" /> My Order
+                  </Link>
+                }
                 <button
                   className="flex items-center gap-2 w-full text-left px-3 py-3 hover:bg-red-50 rounded-lg text-gray-700 font-medium"
                   onClick={() => {
