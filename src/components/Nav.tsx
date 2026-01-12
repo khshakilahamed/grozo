@@ -1,17 +1,19 @@
 "use client";
 
 import { IUser } from "@/models/user.model";
-import { Boxes, ClipboardCheck, LogOut, Package, PlusCircle, Search, ShoppingCart, User, X } from "lucide-react";
+import { Boxes, ClipboardCheck, LogOut, Menu, Package, PlusCircle, Search, ShoppingCart, User, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const Nav = ({ user }: { user: IUser }) => {
   const [open, setOpen] = useState(false);
-  const [searchBarOpen, setSearchBarOpen] = useState(false);
   const profileDropDown = useRef<HTMLDivElement>(null);
+  const [searchBarOpen, setSearchBarOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutSide = (e: MouseEvent) => {
@@ -26,6 +28,24 @@ const Nav = ({ user }: { user: IUser }) => {
 
     return () => document.removeEventListener("mousedown", handleClickOutSide);
   });
+
+  // console.log(menuOpen);
+
+  const sideBar = menuOpen ? createPortal(
+    <AnimatePresence>
+      <motion.div
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: 100, opacity: 0 }}
+        transition={{ duration: 0.4 }}
+        className="fixed top-0 left-0 h-full w-[75%] sm:w-[60%] z-9999 bg-linear-to-b from-green-800/90 via-green-700/80 to-green-900/90 backdrop-blur-xl border-r border-green-400/20 shadow-[0_0_50px_-10px_rgba(0,255,100,0.3)] flex flex-col p-6 text-white"
+      >
+      </motion.div>
+    </AnimatePresence>, document.body
+  ) : null;
+
+  console.log("sideBar: ", sideBar)
+
 
   return (
     <div className="w-[95%] fixed top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-green-500 to-green-700 rounded-2xl shadow-lg shadow-black/30 flex justify-between items-center h-20 px-4 md:px-8 z-50">
@@ -98,6 +118,12 @@ const Nav = ({ user }: { user: IUser }) => {
                 <ClipboardCheck className="w-5 h-5" />
                 Manage Orders
               </Link>
+            </div>
+            <div
+              className="md:hidden bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-md"
+              onClick={() => setMenuOpen(prev => !prev)}
+            >
+              <Menu className="text-green-600 w-6 h-6" />
             </div>
           </>
         }
@@ -197,6 +223,7 @@ const Nav = ({ user }: { user: IUser }) => {
           </AnimatePresence>
         </div>
       </div>
+      {sideBar}
     </div>
   );
 };
