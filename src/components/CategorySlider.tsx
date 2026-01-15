@@ -22,9 +22,6 @@ const CategorySlider = () => {
       const [showRight, setShowRight] = useState(false);
       const scrollRef = useRef<HTMLDivElement>(null);
 
-      console.log("showLeft: ", showLeft);
-      console.log("showRight: ", showRight);
-
       const scroll = (direction: "left" | "right") => {
             if (!scrollRef.current) return;
             const scrollAmount = direction === "left" ? -300 : 300;
@@ -36,8 +33,23 @@ const CategorySlider = () => {
             const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
             console.log("checkScroll")
             setShowLeft(scrollLeft > 0);
-            setShowRight(scrollWidth > (scrollLeft + clientWidth))
+            setShowRight(scrollWidth - 5 >= (scrollLeft + clientWidth))
       }
+
+      useEffect(() => {
+            const autoScroll = setInterval(() => {
+                  if (!scrollRef.current) return;
+                  const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+
+                  if (scrollWidth - 5 <= (scrollLeft + clientWidth)) {
+                        scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+                  } else {
+                        scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+                  }
+            }, 4000);
+
+            return () => clearInterval(autoScroll)
+      }, []);
 
       useEffect(() => {
             const el = scrollRef.current;
