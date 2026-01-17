@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Provider from "@/Provider";
+import StoreProvider from "@/redux/StoreProvider";
 
 export const metadata: Metadata = {
   title: "Grozo - 10 minutes grocery delivery App",
@@ -15,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="w-full min-h-[200vh] bg-linear-to-b from-green-50 to-white">
-        <Provider>{children}</Provider>
+        <Provider>
+          <StoreProvider>
+            {children}
+          </StoreProvider>
+        </Provider>
       </body>
     </html>
   );
