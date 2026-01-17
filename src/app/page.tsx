@@ -12,7 +12,6 @@ export default async function Home() {
   await connectDb();
   const session = await auth();
   const user = await User.findById(session?.user?.id);
-  console.log(user);
 
   if (!user) {
     redirect("/login");

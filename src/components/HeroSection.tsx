@@ -32,7 +32,7 @@ const slides = [
 ];
 
 const HeroSection = () => {
-      const [current, setCurrent] = useState(0)
+      const [current, setCurrent] = useState(0);
 
       useEffect(() => {
             const timer = setInterval(() => {
