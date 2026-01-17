@@ -1,6 +1,7 @@
 "use client";
 
 import { IUser } from "@/models/user.model";
+import { useAppSelector } from "@/redux/hook";
 import { Boxes, ClipboardCheck, LogOut, Menu, Package, PlusCircle, Search, ShoppingCart, User, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { signOut } from "next-auth/react";
@@ -14,6 +15,7 @@ const Nav = ({ user }: { user: IUser }) => {
   const profileDropDown = useRef<HTMLDivElement>(null);
   const [searchBarOpen, setSearchBarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { cartData } = useAppSelector((state) => state.cart);
 
   useEffect(() => {
     const handleClickOutSide = (e: MouseEvent) => {
@@ -101,9 +103,6 @@ const Nav = ({ user }: { user: IUser }) => {
     document.body
   ) : null;
 
-
-  console.log("sideBar: ", sideBar)
-
   return (
     <div className="w-[95%] fixed top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-green-500 to-green-700 rounded-2xl shadow-lg shadow-black/30 flex justify-between items-center h-20 px-4 md:px-8 z-50">
       {/* Logo */}
@@ -145,7 +144,7 @@ const Nav = ({ user }: { user: IUser }) => {
             >
               <ShoppingCart className="text-green-600 w-6 h-6" />
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
-                0
+                {cartData.length}
               </span>
             </Link>
           </>

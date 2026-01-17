@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppDispatch } from "@/redux/hook";
-import { setUserData } from "@/redux/userSlice";
+import { setUserData } from "@/redux/slices/userSlice";
 import axios from "axios";
 import { useEffect } from "react";
 
