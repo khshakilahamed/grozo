@@ -19,7 +19,7 @@ const markerIcon = new L.Icon({
 const CheckoutPage = () => {
       const router = useRouter();
       const { userData } = useAppSelector((state) => state.user);
-      const { subTotal, deliveryFee, finalTotal } = useAppSelector((state) => state.cart);
+      const { cartData, subTotal, deliveryFee, finalTotal } = useAppSelector((state) => state.cart);
       const [address, setAddress] = useState({
             fullName: "",
             mobile: "",
@@ -122,6 +122,43 @@ const CheckoutPage = () => {
       const handleCurrentLocation = () => {
             setCurrentGeoPosition();
             setSearchQuery("");
+      }
+
+      // TODO: need to form validate
+      const handleCodPayment = async () => {
+            if (!position) {
+                  return null;
+            }
+            try {
+                  const result = await axios.post("/api/user/order", {
+                        userId: userData?._id,
+                        items: cartData.map(item => ({
+                              grocery: item._id,
+                              name: item.name,
+                              price: item.price,
+                              unit: item.unit,
+                              quantity: item.quantity,
+                              image: item.image,
+                        })),
+                        totalAmount: finalTotal,
+                        deliveryFee: deliveryFee,
+                        address: {
+                              fullName: address.fullAddress,
+                              mobile: address.mobile,
+                              city: address.city,
+                              state: address.state,
+                              fullAddress: address.fullAddress,
+                              postCode: address.postCode,
+                              latitude: position[0],
+                              longitude: position[1]
+                        },
+                        paymentMethod: paymentMethod,
+                  });
+
+                  console.log(result.data);
+            } catch (error) {
+                  console.log(error);
+            }
       }
 
       return (
@@ -303,6 +340,14 @@ const CheckoutPage = () => {
                               <motion.button
                                     whileTap={{ scale: 0.93 }}
                                     className="w-full mt-6 bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold"
+                                    onClick={() => {
+                                          if (paymentMethod === "cod") {
+                                                handleCodPayment()
+                                          }
+                                          else {
+
+                                          }
+                                    }}
                               >
                                     {
                                           paymentMethod === "cod" ? "Place Order" : "Pay & Place order"
