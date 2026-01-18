@@ -8,7 +8,6 @@ import {
   Lock,
   LogIn,
   Mail,
-  User,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -32,10 +31,20 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signIn("credentials", {
+      const res = await signIn("credentials", {
         email,
         password,
+        redirect: false,
       });
+
+      
+      if (res?.ok) {
+        console.log("push");
+        router.push("/");
+      } else {
+        console.log("push error");
+        console.log(res?.error);
+      }
 
       router.push("/");
     } catch (error) {
@@ -102,11 +111,10 @@ const LoginPage = () => {
           return (
             <button
               disabled={!formValidation || loading}
-              className={`w-full font-semibold py-3 rounded-xl transition-all duration-200 shadow-md inline-flex items-center justify-center gap-2 ${
-                formValidation
+              className={`w-full font-semibold py-3 rounded-xl transition-all duration-200 shadow-md inline-flex items-center justify-center gap-2 ${formValidation
                   ? "bg-green-600 hover:bg-green-700 text-white"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+                }`}
             >
               {loading && <Loader2 className="w-5 h-5 animate-spin" />}
               Login
@@ -119,7 +127,7 @@ const LoginPage = () => {
           <span className="flex-1 h-px bg-gray-200"></span>
         </div>
 
-        <div className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200" onClick={()=> signIn('google', {callbackUrl: "/"})}>
+        <div className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200" onClick={() => signIn('google', { callbackUrl: "/" })}>
           <Image src={googleImage} width={20} height={20} alt="google logo" />{" "}
           Continue with Google
         </div>

@@ -6,10 +6,16 @@ export interface ICartGrocery extends IGrocery { quantity: number };
 
 export interface ICartSlice {
       cartData: ICartGrocery[];
+      subTotal: number;
+      deliveryFee: number;
+      finalTotal: number;
 }
 
 const initialState: ICartSlice = {
-      cartData: []
+      cartData: [],
+      subTotal: 0,
+      deliveryFee: 40,
+      finalTotal: 40,
 }
 
 const cartSlice = createSlice({
@@ -18,6 +24,7 @@ const cartSlice = createSlice({
       reducers: {
             addToCart: (state, action: PayloadAction<ICartGrocery>) => {
                   state.cartData.push(action.payload)
+                  cartSlice.caseReducers.calculateTotals(state);
             },
             increaseQuantity: (state, action: PayloadAction<mongoose.Types.ObjectId>) => {
                   const item = state.cartData.find(cItem => cItem._id === action.payload);
@@ -25,6 +32,7 @@ const cartSlice = createSlice({
                   if (item) {
                         item.quantity = item.quantity + 1;
                   }
+                  cartSlice.caseReducers.calculateTotals(state);
 
             },
             decreaseQuantity: (state, action: PayloadAction<mongoose.Types.ObjectId>) => {
@@ -34,11 +42,20 @@ const cartSlice = createSlice({
                   } else {
                         state.cartData = state.cartData.filter(cItem => cItem._id !== action.payload);
                   }
-
+                  cartSlice.caseReducers.calculateTotals(state);
             },
+            removeFromCart: (state, action: PayloadAction<mongoose.Types.ObjectId>) => {
+                  state.cartData = state.cartData.filter(cItem => cItem._id !== action.payload);
+                  cartSlice.caseReducers.calculateTotals(state);
+            },
+            calculateTotals: (state) => {
+                  state.subTotal = state.cartData.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0)
+                  state.deliveryFee = state.subTotal > 100 ? 0 : 40;
+                  state.finalTotal = state.subTotal + state.deliveryFee;
+            }
       }
 });
 
-export const { addToCart, increaseQuantity, decreaseQuantity } = cartSlice.actions;
+export const { addToCart, increaseQuantity, decreaseQuantity, removeFromCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
