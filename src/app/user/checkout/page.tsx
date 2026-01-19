@@ -161,6 +161,45 @@ const CheckoutPage = () => {
             }
       }
 
+      const handleOnlinePayment = async () => {
+            console.log("clicked online payment")
+            if (!position) {
+                  return null;
+            }
+
+            try {
+                  const result = await axios.post("/api/user/payment", {
+                        userId: userData?._id,
+                        items: cartData.map(item => ({
+                              grocery: item._id,
+                              name: item.name,
+                              price: item.price,
+                              unit: item.unit,
+                              quantity: item.quantity,
+                              image: item.image,
+                        })),
+                        totalAmount: finalTotal,
+                        deliveryFee: deliveryFee,
+                        address: {
+                              fullName: address.fullAddress,
+                              mobile: address.mobile,
+                              city: address.city,
+                              state: address.state,
+                              fullAddress: address.fullAddress,
+                              postCode: address.postCode,
+                              latitude: position[0],
+                              longitude: position[1]
+                        },
+                        paymentMethod: paymentMethod,
+                  })
+
+                  window.location.href = result.data.url;
+
+            } catch (error) {
+                  console.log("online payment error: ", error);
+            }
+      }
+
       return (
             <div className="w-[92%] md:w-[80%] mx-auto py-10 relative">
                   <motion.button
@@ -345,7 +384,7 @@ const CheckoutPage = () => {
                                                 handleCodPayment()
                                           }
                                           else {
-
+                                                handleOnlinePayment()
                                           }
                                     }}
                               >

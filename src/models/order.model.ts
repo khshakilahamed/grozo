@@ -13,6 +13,7 @@ export interface IOrder {
                   quantity: number;
             }
       ];
+      isPaid: boolean;
       deliveryFee: number;
       totalAmount: number;
       paymentMethod: "cod" | "online";
@@ -51,6 +52,10 @@ const orderSchema = new mongoose.Schema<IOrder>({
                   quantity: Number,
             }
       ],
+      isPaid: {
+            type: Boolean,
+            default: false,
+      },
       deliveryFee: {
             type: Number,
             required: true
