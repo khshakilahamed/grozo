@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       const rawBody = await req.text();
       let event;
 
-      console.log("rawBody: ", rawBody)
+      // console.log("rawBody: ", rawBody);
 
       try {
             event = stripe.webhooks.constructEvent(rawBody, signature!, process.env.STRIPE_WEBHOOK_SECRET!);
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
             console.error("signature verification failed: ", error);
       }
 
-      console.log("event?.type: ", event?.type)
+      // console.log("event?.type: ", event?.type);
 
       if (event?.type === "checkout.session.completed") {
             const session = event.data.object;

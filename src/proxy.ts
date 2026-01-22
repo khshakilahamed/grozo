@@ -34,5 +34,6 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
       // Exclude all files in the public folder and other static assets
-      matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+      // matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+      matcher: ["/((?!api/user/stripe/webhook|_next/static|_next/image|favicon.ico).*)",], // also exclude the stripe webhook
 };
