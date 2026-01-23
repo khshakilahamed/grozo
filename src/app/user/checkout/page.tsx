@@ -143,7 +143,7 @@ const CheckoutPage = () => {
                         totalAmount: finalTotal,
                         deliveryFee: deliveryFee,
                         address: {
-                              fullName: address.fullAddress,
+                              fullName: address.fullName,
                               mobile: address.mobile,
                               city: address.city,
                               state: address.state,
@@ -245,7 +245,7 @@ const CheckoutPage = () => {
                                           <Phone className="absolute left-3 top-3 text-green-600" size={18} />
                                           <input
                                                 type="text"
-                                                placeholder="Full name"
+                                                placeholder="Mobile"
                                                 value={address.mobile}
                                                 onChange={(e) => setAddress((prev) => ({ ...prev, mobile: e.target.value }))}
                                                 className="pl-10 w-full border rounded-lg p-3 text-sm bg-gray-50"
