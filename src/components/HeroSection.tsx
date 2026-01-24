@@ -1,4 +1,6 @@
 "use client";
+import { getSocket } from "@/lib/socket";
+import { useAppSelector } from "@/redux/hook";
 import { Leaf, ShoppingBasket, Smartphone, Truck } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
@@ -32,7 +34,16 @@ const slides = [
 ];
 
 const HeroSection = () => {
+      const { userData } = useAppSelector((state) => state.user);
       const [current, setCurrent] = useState(0);
+
+      useEffect(() => {
+
+            if (userData) {
+                  let socket = getSocket();
+                  socket.emit("identity", userData?._id)
+            }
+      }, [userData]);
 
       useEffect(() => {
             const timer = setInterval(() => {
