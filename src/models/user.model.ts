@@ -8,9 +8,20 @@ export interface IUser {
       mobile?: string;
       role: 'user' | 'deliveryBoy' | 'admin';
       image?: string;
+      location: {
+            type: {
+                  type: StringConstructor;
+                  enum: string[];
+                  default: string;
+            };
+            coordinates: {
+                  type: NumberConstructor[];
+                  default: number[];
+            };
+      }
 }
 
-const useSchema = new mongoose.Schema<IUser>({
+const userSchema = new mongoose.Schema<IUser>({
       name: {
             type: String,
             required: true
@@ -35,11 +46,24 @@ const useSchema = new mongoose.Schema<IUser>({
       },
       image: {
             type: String,
+      },
+      location: {
+            type: {
+                  type: String,
+                  enum: ["Point"],
+                  default: "Point",
+            },
+            coordinates: {
+                  type: [Number],
+                  default: [0, 0], // [longitude, latitude]
+            }
       }
 }, {
       timestamps: true
 });
 
-const User = mongoose.models.User || mongoose.model<IUser>('User', useSchema);
+userSchema.index({ location: "2dsphere" })
+
+const User = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
 export default User;
