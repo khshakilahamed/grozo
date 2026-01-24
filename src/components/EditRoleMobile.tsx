@@ -3,8 +3,8 @@ import axios from "axios";
 import { ArrowRight, Bike, User, UserCog } from "lucide-react";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const EditRoleMobile = () => {
   const [roles, setRoles] = useState([
@@ -33,6 +33,22 @@ const EditRoleMobile = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    const checkForAdmin = async () => {
+      try {
+        const result = await axios.get("/api/check-for-admin");
+
+        if (result.data) {
+          setRoles((prev) => prev.filter(r => r.id !== "admin"))
+        }
+      } catch (error) {
+
+      }
+    }
+
+    checkForAdmin();
+  }, []);
 
   return (
     <div className="flex flex-col items-center min-h-screen p-6 w-full bg-white">
