@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
                   const { latitude, longitude } = order.address;
 
                   const nearByDeliveryBoys = await User.find({
-                        role: "deliveryBody",
+                        role: "deliveryBoy",
                         location: {
                               $near: {
                                     $geometry: {

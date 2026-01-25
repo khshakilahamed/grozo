@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+import { IOrder } from "./order.model";
 
 export interface IDeliveryAssignment {
       _id?: mongoose.Types.ObjectId;
-      order: mongoose.Types.ObjectId;
+      order: mongoose.Types.ObjectId | IOrder;
       broadcastedTo: mongoose.Types.ObjectId[];
       assignedTo: mongoose.Types.ObjectId | null;
       status: "broadcasted" | "assigned" | "completed";

@@ -1,10 +1,10 @@
-import React from 'react';
+import DeliveryBoyDashboard from "./DeliveryBoyDashboard";
 
 const DeliveryBoy = () => {
       return (
-            <div>
-                  
-            </div>
+            <>
+                  <DeliveryBoyDashboard />
+            </>
       );
 };
 
