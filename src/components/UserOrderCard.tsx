@@ -1,7 +1,8 @@
 "use client";
 import { getSocket } from '@/lib/socket';
 import { IOrder } from '@/models/order.model';
-import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Truck } from 'lucide-react';
+import { IUser } from '@/models/user.model';
+import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Truck, UserCheck } from 'lucide-react';
 import { motion } from "motion/react";
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -61,6 +62,8 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                         </div>
                   </div>
 
+
+
                   {/* Payment Method & Address*/}
                   <div className='p-5 space-y-4'>
                         {order.paymentMethod === "cod" ? (
@@ -74,6 +77,29 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                                     <span>Online Payment</span>
                               </div>
                         )}
+
+                        {
+                              order.assignedDeliveryBoy && <>
+                                    <div className='mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between'>
+                                          <div className='flex items-center gap-3 text-sm text-gray-700'>
+                                                <UserCheck className='text-blue-600' size={18} />
+                                                <div className='font-semibold text-gray-800'>
+                                                      <p>Assigned to: <span>{(order.assignedDeliveryBoy as IUser).name}</span></p>
+                                                      <p className='text-xs text-gray-600'>📞 {(order.assignedDeliveryBoy as IUser).mobile}</p>
+                                                </div>
+
+                                          </div>
+                                          <a
+                                                className='bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition'
+                                                href={`tel:${(order.assignedDeliveryBoy as IUser).mobile}`}
+                                          >Call</a>
+                                    </div>
+                                    <button className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow- hover:bg-green-700 transition'> <Truck /> Track Your Order</button>
+                              </>
+
+                        }
+
+
 
                         <div className='flex items-center gap-2 text-gray-700 text-sm'>
                               <MapPin size={16} className='text-green-600' />

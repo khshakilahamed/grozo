@@ -1,13 +1,14 @@
 "use client";
 import { IOrder } from '@/models/order.model';
+import { IUser } from '@/models/user.model';
 import axios from 'axios';
-import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Phone, Truck, User, UserCheck } from 'lucide-react';
 import { motion } from "motion/react"
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const AdminOrderCard = ({ order }: { order: IOrder }) => {
-      const [status, setStatus] = useState<string>(order.status);
+      const [status, setStatus] = useState<string>("pending");
       const [expanded, setExpanded] = useState(false);
       const statusOptions = ["pending", "out of delivery"];
 
@@ -15,12 +16,15 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
             try {
                   const result = await axios.post(`/api/admin/update-order-status/${orderId}`, { status });
 
-                  console.log(result.data);
                   setStatus(status);
             } catch (error) {
                   console.log(error);
             }
       }
+
+      useEffect(() => {
+            setStatus(order.status)
+      }, [order]);
 
       return (
             <motion.div
@@ -29,7 +33,7 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
                   transition={{ duration: 0.4 }}
                   className='bg-white shadow-md hover:shadow-lg border border-gray-100 rounded-2xl p-6 transition-all'
             >
-                  <div className='flex flex-col md:flex-row md:items-start md;justify-between gap-4'>
+                  <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-4'>
                         <div className='space-y-1'>
                               <p className='text-lg font-bold flex items-center gap-2 text-green-700'>
                                     <Package size={20} />
@@ -65,6 +69,23 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
                                     <CreditCard size={16} className='text-green-600' />
                                     <span>{order?.paymentMethod === "cod" ? "Cash on Delivery" : "Online Payment"}</span>
                               </p>
+
+                              {
+                                    order.assignedDeliveryBoy && <div className='mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between'>
+                                          <div className='flex items-center gap-3 text-sm text-gray-700'>
+                                                <UserCheck className='text-blue-600' size={18} />
+                                                <div className='font-semibold text-gray-800'>
+                                                      <p>Assigned to: <span>{(order.assignedDeliveryBoy as IUser).name}</span></p>
+                                                      <p className='text-xs text-gray-600'>📞 {(order.assignedDeliveryBoy as IUser).mobile}</p>
+                                                </div>
+
+                                          </div>
+                                          <a
+                                                className='bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition'
+                                                href={`tel:${(order.assignedDeliveryBoy as IUser).mobile}`}
+                                          >Call</a>
+                                    </div>
+                              }
                         </div>
 
                         <div className='flex flex-col items-start md:items-end gap-2'>

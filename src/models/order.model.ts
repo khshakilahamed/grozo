@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IUser } from "./user.model";
 
 export interface IOrder {
       _id?: mongoose.Types.ObjectId;
@@ -28,7 +29,7 @@ export interface IOrder {
             longitude: number;
       };
       assignment?: mongoose.Types.ObjectId;
-      assignedDeliveryBoy?: mongoose.Types.ObjectId;
+      assignedDeliveryBoy?: mongoose.Types.ObjectId | IUser;
       status: "pending" | "out of delivery" | "delivered";
       createdAt?: Date;
       updatedAt?: Date;
