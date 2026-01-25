@@ -1,5 +1,6 @@
 "use client";
 
+import { getSocket } from "@/lib/socket";
 import { IDeliveryAssignment } from "@/models/deliveryAssignment.model";
 import { IOrder } from "@/models/order.model";
 import axios from "axios";
@@ -22,7 +23,15 @@ const DeliveryBoyDashboard = () => {
             fetchAssignments();
       }, []);
 
-      console.log("assignments: ", assignments)
+      useEffect(():any =>{
+            const socket = getSocket();
+
+            socket.on("new-assignment", ({deliveryAssignment}) => {
+                  setAssignments((prev) => [...prev, deliveryAssignment]);
+            });
+
+            return ()=> socket.off("new-assignment")
+      }, []);
 
       return (
             <div className="w-full min-h-screen bg-gray-50 p-4">

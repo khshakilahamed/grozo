@@ -1,6 +1,7 @@
 "use client";
 
 import AdminOrderCard from "@/components/AdminOrderCard";
+import { getSocket } from "@/lib/socket";
 import { IOrder } from "@/models/order.model";
 import axios from "axios";
 import { ArrowLeft } from "lucide-react";
@@ -23,6 +24,16 @@ const ManageOrders = () => {
             }
             getOrders()
       }, []);
+
+      useEffect((): any => {
+            const socket = getSocket();
+            socket.on("new-order", (newOrder) => {
+                  setOrders(prev => [newOrder, ...prev])
+            });
+
+            return () => socket.off("new-order");
+      }, []);
+
       return (
             <div className="min-h-screen bg-gray-50 w-full">
                   <div className="fixed top-0 left-0 right-0 backdrop-blur-lg bg-white/70 shadow-sm border-b z-50">

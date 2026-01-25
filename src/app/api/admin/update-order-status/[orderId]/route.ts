@@ -1,4 +1,5 @@
 import connectDb from "@/lib/db";
+import emitEventHandler from "@/lib/emitEventHandler";
 import DeliveryAssignment from "@/models/deliveryAssignment.model";
 import Order, { IOrder } from "@/models/order.model";
 import User from "@/models/user.model";
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
 
             order.status = status;
             let deliveryBoysPayload: any = [];
+            let candidates: any = [];
+            let deliveryAssignment;
+
             if (status === "out of delivery" && !order.assignment) {
                   const { latitude, longitude } = order.address;
 
@@ -47,10 +51,15 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
                   const busyIdSet = new Set(busyIds.map(b => String(b)));
                   const availableDeliveryBoys = nearByDeliveryBoys.filter(b => !busyIdSet.has(String(b._id)));
 
-                  const candidates = availableDeliveryBoys.map(b => b._id);
+                  candidates = availableDeliveryBoys.map(b => b._id);
 
                   if (candidates.length === 0) {
                         await order.save();
+
+                        await emitEventHandler("order-status-update", {
+                              orderId: order?._id,
+                              status: order.status
+                        });
 
                         return NextResponse.json(
                               { message: "there is no available delivery boys." },
@@ -58,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
                         )
                   }
 
-                  const deliveryAssignment = await DeliveryAssignment.create({
+                  deliveryAssignment = await DeliveryAssignment.create({
                         order: order._id,
                         broadcastedTo: candidates,
                         status: "broadcasted"
@@ -80,13 +89,30 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
             await order.save();
             await order.populate("user");
 
-            return NextResponse.json(
+            NextResponse.json(
                   {
                         assignment: order.assignment?._id,
                         availableBoys: deliveryBoysPayload
                   },
                   { status: 200 }
-            )
+            );
+
+            await emitEventHandler("order-status-update", {
+                  orderId: order?._id,
+                  status: order.status
+            });
+
+            for (const boyId of candidates) {
+                  const boy = await User.findById(boyId);
+                  if (boy.socketId) {
+                        await emitEventHandler("new-assignment", {
+                              deliveryAssignment,
+                              socketId: boy.socketId,
+                        });
+                  }
+            }
+
+            return;
 
 
       } catch (error) {
