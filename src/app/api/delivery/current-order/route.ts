@@ -9,12 +9,7 @@ export async function GET() {
             const session = await auth();
             const deliveryBoyId = session?.user?.id;
             // const order = await Order.findOne({assignedDeliveryBoy: deliveryBoyId});
-            const activeAssignment = await DeliveryAssignment.findOne({ assignedTo: deliveryBoyId, status: "assigned" }).populate(
-                  {
-                        path: "order",
-                        populate: { path: "address" }
-                  }
-            ).lean();
+            const activeAssignment = await DeliveryAssignment.findOne({ assignedTo: deliveryBoyId, status: "assigned" }).populate("order");
 
             if (!activeAssignment) {
                   return NextResponse.json(

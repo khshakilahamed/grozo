@@ -6,12 +6,25 @@ import { IOrder } from "@/models/order.model";
 import { useAppSelector } from "@/redux/hook";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import LiveMap from "./LiveMap";
 
+export interface ILocation {
+      latitude: number,
+      longitude: number;
+}
 const DeliveryBoyDashboard = () => {
       const [assignments, setAssignments] = useState<IDeliveryAssignment[]>([]);
       const { userData } = useAppSelector((state) => state.user);
       const [activeOrder, setActiveOrder] = useState<any>(null);
-      const [userLocation, setUserLocation] = useState<any>(null);
+      const [userLocation, setUserLocation] = useState<ILocation>({
+            latitude: 0,
+            longitude: 0
+      });
+      const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation>({
+            latitude: 0,
+            longitude: 0
+      });
+      let socket = getSocket();
 
       const fetchAssignments = async () => {
             try {
@@ -24,14 +37,35 @@ const DeliveryBoyDashboard = () => {
       }
 
       useEffect((): any => {
-            const socket = getSocket();
-
             socket.on("new-assignment", ({ deliveryAssignment }) => {
                   setAssignments((prev) => [...prev, deliveryAssignment]);
             });
 
             return () => socket.off("new-assignment")
       }, []);
+
+      useEffect(() => {
+            if (!userData?._id) return
+
+            if (!navigator.geolocation) return;
+
+            const watcher = navigator.geolocation.watchPosition((pos) => {
+                  const lat = pos.coords.latitude;
+                  const lon = pos.coords.longitude;
+
+                  setDeliveryBoyLocation({ latitude: lat, longitude: lon })
+
+                  socket.emit("update-location", {
+                        userId: userData?._id,
+                        latitude: lat,
+                        longitude: lon,
+                  })
+            }, (error) => {
+                  console.log(error)
+            }, { enableHighAccuracy: true });
+
+            return () => navigator.geolocation.clearWatch(watcher);
+      }, [userData?._id]);
 
 
       const fetchCurrentOrder = async () => {
@@ -56,19 +90,8 @@ const DeliveryBoyDashboard = () => {
             fetchCurrentOrder();
             fetchAssignments();
       }, [userData]);
-      
+
       console.log(activeOrder, userLocation)
-
-      if(activeOrder && userLocation){
-            return (<div className="p-4 pt-30 min-h-screen bg-gray-50">
-                  <div className="max-w-3xl mx-auto">
-                        <h1 className="text-2xl font-bold text-green-700 mb-2">Active Delivery</h1>
-                        <p>order #{activeOrder.order?._id.toString().slice(-6)}</p>
-
-                        <div className="rounded-xl border shadow-lg overflow-hidden mb-6"></div>
-                  </div>
-            </div>)
-      }
 
       const handleAccept = async (id: string) => {
             try {
@@ -80,7 +103,18 @@ const DeliveryBoyDashboard = () => {
             }
       }
 
+      if (activeOrder && userLocation) {
+            return (<div className="p-4 pt-30 min-h-screen bg-gray-50">
+                  <div className="max-w-3xl mx-auto">
+                        <h1 className="text-2xl font-bold text-green-700 mb-2">Active Delivery</h1>
+                        <p>order #{activeOrder.order?._id.toString().slice(-6)}</p>
 
+                        <div className="rounded-xl border shadow-lg overflow-hidden mb-6">
+                              <LiveMap userLocation={userLocation} deliveryBoyLocation={deliveryBoyLocation} />
+                        </div>
+                  </div>
+            </div>)
+      }
 
       return (
             <div className="w-full min-h-screen bg-gray-50 p-4">
