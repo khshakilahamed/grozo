@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, CreditCard, MapPin, Package, Truck, UserCheck }
 import { motion } from "motion/react";
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation"
 
 const getStatusColor = (status: string) => {
       switch (status) {
@@ -23,6 +24,7 @@ const getStatusColor = (status: string) => {
 const UserOrderCard = ({ order }: { order: IOrder }) => {
       const [expanded, setExpanded] = useState(false);
       const [status, setStatus] = useState(order.status);
+      const router = useRouter()
 
       useEffect((): any => {
             const socket = getSocket();
@@ -94,7 +96,10 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                                                 href={`tel:${(order.assignedDeliveryBoy as IUser).mobile}`}
                                           >Call</a>
                                     </div>
-                                    <button className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow- hover:bg-green-700 transition'> <Truck /> Track Your Order</button>
+                                    <button
+                                          className='w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow- hover:bg-green-700 transition'
+                                          onClick={() => router.push(`/user/track-order/${order?._id?.toString()}`)}
+                                    > <Truck /> Track Your Order</button>
                               </>
 
                         }

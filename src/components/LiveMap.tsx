@@ -37,7 +37,9 @@ const LiveMap = ({ userLocation, deliveryBoyLocation }: ILiveMapProps) => {
                         </Marker>
 
                         {
-                              deliveryBoyLocation && <Marker position={[deliveryBoyLocation.latitude, deliveryBoyLocation.longitude]} icon={deliveryBoyIcon}></Marker>
+                              deliveryBoyLocation && <Marker position={[deliveryBoyLocation.latitude, deliveryBoyLocation.longitude]} icon={deliveryBoyIcon}>
+                                    <Popup>Delivery Boy</Popup>
+                              </Marker>
                         }
                         <Polyline positions={linePositions as any} color='green'/>
 
