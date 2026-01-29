@@ -39,11 +39,13 @@ const EditRoleMobile = () => {
       try {
         const result = await axios.get("/api/check-for-admin");
 
-        if (result.data) {
+        console.log("check role result: ", result)
+
+        if (result?.data?.adminExist) {
           setRoles((prev) => prev.filter(r => r.id !== "admin"))
         }
       } catch (error) {
-
+        console.log(error);
       }
     }
 

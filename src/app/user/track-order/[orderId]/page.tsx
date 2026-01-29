@@ -1,10 +1,26 @@
 "use client";
+import { ILocation } from "@/components/DeliveryBoyDashboard";
+import LiveMap from "@/components/LiveMap";
+import { IOrder } from "@/models/order.model";
+import { useAppSelector } from "@/redux/hook";
 import axios from "axios";
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const TrackOrder = ({ params }: { params: { orderId: string } }) => {
+      const { userData } = useAppSelector((state) => state.user);
       const { orderId } = useParams();
+      const [order, setOrder] = useState<IOrder>();
+      const [userLocation, setUserLocation] = useState<ILocation>({
+            latitude: 0,
+            longitude: 0
+      });
+      const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation>({
+            latitude: 0,
+            longitude: 0
+      });
+      const router = useRouter();
 
       useEffect(() => {
             const getOrder = async () => {
@@ -12,18 +28,45 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
                         const result = await axios.get(`/api/user/get-order/${orderId}`);
 
                         console.log(result.data);
-
+                        setOrder(result.data);
+                        setUserLocation({
+                              latitude: result.data.address.latitude,
+                              longitude: result.data.address.longitude,
+                        })
+                        setDeliveryBoyLocation({
+                              latitude: result.data.assignedDeliveryBoy.location[1],
+                              longitude: result.data.assignedDeliveryBoy.location[0],
+                        })
                   } catch (error) {
                         console.log(error);
                   }
             }
 
             getOrder()
-      }, []);
+      }, [userData?._id]);
 
       return (
-            <div>
+            <div className="w-full min-h-screen bg-linear-to-b from-green-50 to-white">
+                  <div className="max-w-2xl mx-auto pb-24">
+                        <div className="sticky top-0 bg-white/80 backdrop-blur-xl p-4 border-b shadow flex gap-3 items-center z-999">
+                              <button
+                                    className="p-2 bg-green-100 rounded-full"
+                                    onClick={() => router.back()}
+                              >
+                                    <ArrowLeft className="text-green-700" size={20} />
+                              </button>
+                              <div>
+                                    <h2>Track Order</h2>
+                                    <p className="text-sm text-gray-600">order#{order?._id!.toString().slice(-6)} <span className="text-green-700 font-semibold">{order?.status}</span></p>
+                              </div>
+                        </div>
 
+                        <div className="px-4 mt-6">
+                              <div className="rounded-3xl overflow-hidden border shadow">
+                                    <LiveMap userLocation={userLocation} deliveryBoyLocation={deliveryBoyLocation} />
+                              </div>
+                        </div>
+                  </div>
             </div>
       );
 };
