@@ -26,16 +26,16 @@ function Recenter({ positions }: { positions: [number, number] }) {
 
 const LiveMap = ({ userLocation, deliveryBoyLocation }: ILiveMapProps) => {
       // ✅ Do not mount map until valid coordinates exist
-      // const hasUserLocation =
-      //       userLocation.latitude !== 0 && userLocation.longitude !== 0;
+      const hasUserLocation =
+            userLocation.latitude !== 0 && userLocation.longitude !== 0;
 
-      // if (!hasUserLocation) {
-      //       return (
-      //             <div className="w-full h-125 flex items-center justify-center">
-      //                   Loading map...
-      //             </div>
-      //       );
-      // }
+      if (!hasUserLocation) {
+            return (
+                  <div className="w-full h-125 flex items-center justify-center">
+                        Loading map...
+                  </div>
+            );
+      }
 
       // ✅ Memoize icons
       const userIcon = useMemo(

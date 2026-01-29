@@ -1,6 +1,7 @@
 "use client";
 
 import { ILocation } from "@/components/DeliveryBoyDashboard";
+import LiveMap from "@/components/LiveMap";
 import { getSocket } from "@/lib/socket";
 import { IOrder } from "@/models/order.model";
 import { useAppSelector } from "@/redux/hook";
@@ -8,10 +9,6 @@ import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-const LiveMap = dynamic(() => import("@/components/LiveMap"), {
-      ssr: false,
-});
 
 const TrackOrder = ({ params }: { params: { orderId: string } }) => {
       const { userData } = useAppSelector((state) => state.user);
@@ -32,8 +29,6 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
                   try {
                         const result = await axios.get(`/api/user/get-order/${orderId}`);
 
-                        console.log("api result.data: ", result.data);
-
                         if (result.data) {
                               setOrder(result.data);
                               setUserLocation({
@@ -52,8 +47,6 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
 
             getOrder()
       }, [userData?._id]);
-
-      console.log(order)
 
 
       useEffect(() => {

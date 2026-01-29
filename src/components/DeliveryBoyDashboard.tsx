@@ -91,8 +91,6 @@ const DeliveryBoyDashboard = () => {
             fetchAssignments();
       }, [userData]);
 
-      console.log(activeOrder, userLocation)
-
       const handleAccept = async (id: string) => {
             try {
                   const result = await axios.get(`/api/delivery/assignment/${id}/accept-assignment`)
