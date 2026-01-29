@@ -1,12 +1,17 @@
 "use client";
+
 import { ILocation } from "@/components/DeliveryBoyDashboard";
-import LiveMap from "@/components/LiveMap";
+import { getSocket } from "@/lib/socket";
 import { IOrder } from "@/models/order.model";
 import { useAppSelector } from "@/redux/hook";
 import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+const LiveMap = dynamic(() => import("@/components/LiveMap"), {
+      ssr: false,
+});
 
 const TrackOrder = ({ params }: { params: { orderId: string } }) => {
       const { userData } = useAppSelector((state) => state.user);
@@ -27,16 +32,19 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
                   try {
                         const result = await axios.get(`/api/user/get-order/${orderId}`);
 
-                        console.log(result.data);
-                        setOrder(result.data);
-                        setUserLocation({
-                              latitude: result.data.address.latitude,
-                              longitude: result.data.address.longitude,
-                        })
-                        setDeliveryBoyLocation({
-                              latitude: result.data.assignedDeliveryBoy.location[1],
-                              longitude: result.data.assignedDeliveryBoy.location[0],
-                        })
+                        console.log("api result.data: ", result.data);
+
+                        if (result.data) {
+                              setOrder(result.data);
+                              setUserLocation({
+                                    latitude: result.data.address.latitude,
+                                    longitude: result.data.address.longitude,
+                              })
+                              setDeliveryBoyLocation({
+                                    longitude: result.data.assignedDeliveryBoy.location?.coordinates[0],
+                                    latitude: result.data.assignedDeliveryBoy.location?.coordinates[1],
+                              })
+                        }
                   } catch (error) {
                         console.log(error);
                   }
@@ -44,6 +52,30 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
 
             getOrder()
       }, [userData?._id]);
+
+      console.log(order)
+
+
+      useEffect(() => {
+            if (!order) return;
+
+            const socket = getSocket();
+
+            const handler = ({ userId, location }: any) => {
+                  if (String(userId) === String(order.assignedDeliveryBoy?._id)) {
+                        setDeliveryBoyLocation({
+                              longitude: location.coordinates[0],
+                              latitude: location.coordinates[1],
+                        });
+                  }
+            };
+
+            socket.on("update-deliveryBoy-location", handler);
+
+            return () => {
+                  socket.off("update-deliveryBoy-location", handler);
+            };
+      }, [order]);
 
       return (
             <div className="w-full min-h-screen bg-linear-to-b from-green-50 to-white">
