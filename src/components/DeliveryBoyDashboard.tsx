@@ -7,6 +7,7 @@ import { useAppSelector } from "@/redux/hook";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import LiveMap from "./LiveMap";
+import DeliveryChat from "./DeliveryChat";
 
 export interface ILocation {
       latitude: number,
@@ -110,6 +111,11 @@ const DeliveryBoyDashboard = () => {
                         <div className="rounded-xl border shadow-lg overflow-hidden mb-6">
                               <LiveMap userLocation={userLocation} deliveryBoyLocation={deliveryBoyLocation} />
                         </div>
+
+                        <DeliveryChat
+                              orderId={activeOrder.order._id}
+                              deliveryBoyId={userData?._id!}
+                        />
                   </div>
             </div>)
       }
