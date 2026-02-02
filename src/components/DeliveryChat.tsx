@@ -5,7 +5,7 @@ import axios from "axios";
 import { Send } from "lucide-react";
 import mongoose from "mongoose";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type props = {
       orderId: mongoose.Types.ObjectId;
@@ -15,13 +15,23 @@ const DeliveryChat = ({ orderId, deliveryBoyId }: props) => {
       const [newMessage, setNewMessage] = useState("");
       const [messages, setMessages] = useState<IMessage[]>([]);
       const socket = getSocket();
+      const chatBoxRef = useRef<HTMLDivElement>(null);
 
       useEffect((): any => {
             if (orderId) {
                   socket.emit("join-room", orderId)
+
+                  socket.on("send-message", (message) => {
+                        if (message.roomId === orderId) {
+                              setMessages(prev => [...prev, message]);
+                        }
+                  });
             }
 
-            return () => socket.off("join-room")
+            return () => {
+                  socket.off("join-room");
+                  socket.off("send-message");
+            }
       }, []);
 
       useEffect(() => {
@@ -39,6 +49,13 @@ const DeliveryChat = ({ orderId, deliveryBoyId }: props) => {
             getAllMessages();
       }, []);
 
+      useEffect(()=>{
+            chatBoxRef.current?.scrollTo({
+                  top: chatBoxRef.current.scrollHeight,
+                  behavior: "smooth",
+            })
+      }, [messages]);
+
       const sendMsg = () => {
             const message = {
                   roomId: orderId,
@@ -49,19 +66,13 @@ const DeliveryChat = ({ orderId, deliveryBoyId }: props) => {
                   )
             }
             socket.emit("send-message", message);
-            socket.on("send-message", (message) => {
-                  if (message.roomId === orderId) {
-                        setMessages(prev => [...prev, message]);
-                  }
-            });
 
             setNewMessage("");
       }
 
       return (
             <div className="bg-white rounded-3xl shadow-lg border p-4 h-107.5 flex flex-col">
-
-                  <div className="flex-1 overflow-y-auto p-2 space-y-3">
+                  <div className="flex-1 overflow-y-auto p-2 space-y-3" ref={chatBoxRef}>
                         <AnimatePresence>
                               {
                                     messages.map((msg, index) => (
