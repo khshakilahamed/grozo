@@ -92,6 +92,17 @@ const DeliveryBoyDashboard = () => {
             fetchAssignments();
       }, [userData]);
 
+      useEffect((): any => {
+            socket.on("update-deliveryBoy-location", ({ userId, location }) => {
+                  setDeliveryBoyLocation({
+                        latitude: location?.coordinates[1],
+                        longitude: location?.coordinates[0],
+                  })
+            });
+
+            return () => socket.off("update-deliveryBoy-location")
+      }, []);
+
       const handleAccept = async (id: string) => {
             try {
                   const result = await axios.get(`/api/delivery/assignment/${id}/accept-assignment`)

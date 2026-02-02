@@ -7,7 +7,7 @@ import { IMessage } from "@/models/message.model";
 import { IOrder } from "@/models/order.model";
 import { useAppSelector } from "@/redux/hook";
 import axios from "axios";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Loader2, Send, Sparkle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -27,6 +27,8 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
       const [newMessage, setNewMessage] = useState("");
       const [messages, setMessages] = useState<IMessage[]>([]);
       const chatBoxRef = useRef<HTMLDivElement>(null);
+      const [loading, setLoading] = useState(false);
+      const [suggestions, setSuggestions] = useState([]);
       const router = useRouter();
       const socket = getSocket();
 
@@ -128,6 +130,24 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
             setNewMessage("");
       }
 
+      const getSuggestions = async () => {
+            setLoading(true)
+            try {
+                  const lastMessage = messages?.filter(m => m.senderId !== userData?._id)?.at(-1);
+                  const result = await axios.post("/api/chat/ai-suggestions", {
+                        message: lastMessage?.text,
+                        role: "user",
+                  });
+
+                  console.log(result.data);
+                  setSuggestions(result?.data);
+            } catch (error) {
+                  console.log(error);
+            } finally {
+                  setLoading(false)
+            }
+      }
+
       return (
             <div className="w-full min-h-screen bg-linear-to-b from-green-50 to-white">
                   <div className="max-w-2xl mx-auto pb-24">
@@ -150,6 +170,31 @@ const TrackOrder = ({ params }: { params: { orderId: string } }) => {
                               </div>
 
                               <div className="bg-white rounded-3xl shadow-lg border p-4 h-107.5 flex flex-col">
+                                    <div className="flex justify-between items-center mb-3">
+                                          <span>Quick Replies</span>
+                                          <motion.button
+                                                whileTap={{ scale: 0.9 }}
+                                                className="px-3 py-1 text-xs flex items-center gap-1 bg-purple-100 text-purple-700 rounded-full shadow-sm border border-purple-200 cursor-pointer"
+                                                onClick={getSuggestions}
+                                                disabled={loading}
+                                          >
+                                                <Sparkle size={14} />{loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "AI suggest"}
+                                          </motion.button>
+                                    </div>
+                                    <div className="flex gap-2 flex-wrap mb-2">
+                                          {
+                                                suggestions.map((s, index) => (
+                                                      <motion.div
+                                                            key={s}
+                                                            whileTap={{ scale: 0.92 }}
+                                                            className="px-3 py-1 text-xs bg-green-50 border-green-200 text-green-700 rounded-full cursor-pointer"
+                                                            onClick={() => setNewMessage(s)}
+                                                      >
+                                                            {s}
+                                                      </motion.div>
+                                                ))
+                                          }
+                                    </div>
                                     <div className="flex-1 overflow-y-auto p-2 space-y-3" ref={chatBoxRef}>
                                           <AnimatePresence>
                                                 {
