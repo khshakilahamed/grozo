@@ -147,6 +147,7 @@ const DeliveryBoyDashboard = () => {
 
                   console.log(result.data);
                   setActiveOrder(null);
+                  await fetchCurrentOrder();
             } catch (error) {
                   console.log(error);
                   setOtpError("Otp Verification Error.");
@@ -175,7 +176,7 @@ const DeliveryBoyDashboard = () => {
                                     !activeOrder.order.deliveryOtpVerification && !showOtpBox && (
                                           <button
                                                 onClick={sendOtp}
-                                                className="w-full py-4 bg-green-600 text-white rounded-lg"
+                                                className="w-full py-4 bg-green-600 text-white rounded-lg text-center"
                                                 disabled={sendOtpLoading}
                                           >
                                                 {
@@ -197,7 +198,7 @@ const DeliveryBoyDashboard = () => {
                                                 value={otp}
                                           />
                                           <button
-                                                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg"
+                                                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg text-center"
                                                 onClick={verifyOtp}
                                                 disabled={verifyOtpLoading}
                                           >
@@ -207,6 +208,10 @@ const DeliveryBoyDashboard = () => {
                                           </button>
                                           {otpError && <div className="text-red-600 mt-2">{otpError}</div>}
                                     </div>
+                              }
+
+                              {
+                                    activeOrder?.order?.deliveryOtpVerification && <div className="text-green-700 text-center font-bold">Delivery completed</div>
                               }
                         </div>
                   </div>
