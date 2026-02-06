@@ -40,7 +40,7 @@ const Nav = ({ user }: { user: IUser }) => {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -100 }}
         transition={{ type: "spring", stiffness: 100, damping: 14 }}
-        className="fixed top-0 left-0 h-full w-[50%] sm:w-[60%] z-50 bg-linear-to-b from-green-800/90 via-green-700/80 to-green-900/90 backdrop-blur-xl border-r border-green-400/20 shadow-[0_0_50px_-10px_rgba(0,255,100,0.3)] flex flex-col p-6 text-white"
+        className="fixed top-0 left-0 h-full w-[50%] sm:w-[60%] z-9999 bg-linear-to-b from-green-800/90 via-green-700/80 to-green-900/90 backdrop-blur-xl border-r border-green-400/20 shadow-[0_0_50px_-10px_rgba(0,255,100,0.3)] flex flex-col p-6 text-white"
       >
         <div className="flex justify-between items-center mb-2">
           <h1 className="font-extrabold text-2xl tracking-wide text-white/90">Admin Panel</h1>
