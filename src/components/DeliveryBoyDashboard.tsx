@@ -45,7 +45,13 @@ const DeliveryBoyDashboard = () => {
 
       useEffect((): any => {
             socket.on("new-assignment", ({ deliveryAssignment }) => {
-                  setAssignments((prev) => [...prev, deliveryAssignment]);
+                  setAssignments((prev) => {
+                        if (!prev?.filter(assignment => assignment?.order?._id?.toString() === deliveryAssignment?.order?._id?.toString())?.length) {
+                              return [...prev, deliveryAssignment]
+                        } else {
+                              return prev;
+                        }
+                  });
             });
 
             return () => socket.off("new-assignment")
@@ -113,7 +119,11 @@ const DeliveryBoyDashboard = () => {
             try {
                   const result = await axios.get(`/api/delivery/assignment/${id}/accept-assignment`)
 
-                  console.log(result.data);
+                  if (result.data) {
+                        setAssignments([]);
+                        fetchAssignments();
+                        fetchCurrentOrder();
+                  }
             } catch (error) {
                   console.log(error);
             }
@@ -176,7 +186,7 @@ const DeliveryBoyDashboard = () => {
                                     !activeOrder.order.deliveryOtpVerification && !showOtpBox && (
                                           <button
                                                 onClick={sendOtp}
-                                                className="w-full py-4 bg-green-600 text-white rounded-lg text-center"
+                                                className="w-full py-4 bg-green-600 text-white rounded-lg flex justify-center"
                                                 disabled={sendOtpLoading}
                                           >
                                                 {
@@ -198,7 +208,7 @@ const DeliveryBoyDashboard = () => {
                                                 value={otp}
                                           />
                                           <button
-                                                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg text-center"
+                                                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg flex justify-center"
                                                 onClick={verifyOtp}
                                                 disabled={verifyOtpLoading}
                                           >

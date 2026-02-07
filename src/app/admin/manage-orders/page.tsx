@@ -31,7 +31,25 @@ const ManageOrders = () => {
                   setOrders(prev => [newOrder, ...prev])
             });
 
-            return () => socket.off("new-order");
+            socket.on("order-assigned", ({ orderId, assignedDeliveryBoy }) => {
+                  setOrders((prev) => prev?.map(order => (order?._id == orderId ? { ...order, assignedDeliveryBoy } : order)))
+            })
+
+            socket.on("order-status-update", ({ orderId, status }) => {
+                  setOrders(prev =>
+                        prev.map(order =>
+                              String(order._id) === String(orderId)
+                                    ? { ...order, status }
+                                    : order
+                        )
+                  );
+            });
+
+            return () => {
+                  socket.off("new-order");
+                  socket.off("order-assigned");
+                  socket.off("order-status-update");
+            };
       }, []);
 
       return (
@@ -51,7 +69,7 @@ const ManageOrders = () => {
                   <div className="max-2-6xl mx-auto px-4 pt-24 pb-16 space-y-8">
                         <div className="space-y-6">
                               {
-                                    orders.map((order, index) => <AdminOrderCard key={index} order={order} />)
+                                    orders.map((order, index) => <AdminOrderCard key={String(order?._id!)} order={order} />)
                               }
                         </div>
 

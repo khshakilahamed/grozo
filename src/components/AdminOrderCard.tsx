@@ -1,4 +1,5 @@
 "use client";
+import { getSocket } from '@/lib/socket';
 import { IOrder } from '@/models/order.model';
 import { IUser } from '@/models/user.model';
 import axios from 'axios';
@@ -16,7 +17,10 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
             try {
                   const result = await axios.post(`/api/admin/update-order-status/${orderId}`, { status });
 
-                  setStatus(status);
+                  if (result?.data) {
+                        setStatus(status);
+                  }
+
             } catch (error) {
                   console.log(error);
             }
@@ -25,6 +29,20 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
       useEffect(() => {
             setStatus(order.status)
       }, [order]);
+
+      // useEffect((): any => {
+      //       const socket = getSocket();
+      //       socket.on("order-status-update", (data) => {
+      //             console.log("String(data?.orderId): ", String(data?.orderId))
+      //             console.log("String(order?._id): ", String(order?._id))
+      //             console.log("order: ", order);
+      //             if (String(data?.orderId) === String(order?._id)) {
+      //                   setStatus(data.status)
+      //             }
+      //       });
+
+      //       return () => socket.off("order-status-update")
+      // }, []);
 
       return (
             <motion.div
@@ -39,14 +57,16 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
                                     <Package size={20} />
                                     order #{order?._id?.toString()?.slice(-6)}
                               </p>
-                              <span
-                                    className={`px-3 py-1 text-xs font-semibold rounded-full border ${order.isPaid
-                                          ? "bg-green-100 text-green-700 border-green-300"
-                                          : "bg-red-100 text-red-700 border-red-300"
-                                          }`}
-                              >
-                                    {order.isPaid ? "Paid" : "Unpaid"}
-                              </span>
+                              {
+                                    status !== "delivered" && <span
+                                          className={`px-3 py-1 text-xs font-semibold rounded-full border ${order.isPaid
+                                                ? "bg-green-100 text-green-700 border-green-300"
+                                                : "bg-red-100 text-red-700 border-red-300"
+                                                }`}
+                                    >
+                                          {order.isPaid ? "Paid" : "Unpaid"}
+                                    </span>
+                              }
                               <p className='text-gray-500 text-sm'>{new Date(order.createdAt!).toLocaleString()}</p>
 
                               {/* Customer Details */}
@@ -97,17 +117,19 @@ const AdminOrderCard = ({ order }: { order: IOrder }) => {
                                     {status}
                               </span>
 
-                              <select
-                                    className='border border-gray-300 rounded-lg px-3 py-1 text-sm shadow-sm hover:border-green-400 transition focus:ring-2 focus:ring-green-500 outline-none'
-                                    value={status}
-                                    onChange={(e) => updateStatus(order?._id?.toString()!, e.target.value)}
-                              >
-                                    {
-                                          statusOptions.map(st => (
-                                                <option key={st} value={st}>{st.toUpperCase()}</option>
-                                          ))
-                                    }
-                              </select>
+                              {
+                                    status !== "delivered" && <select
+                                          className='border border-gray-300 rounded-lg px-3 py-1 text-sm shadow-sm hover:border-green-400 transition focus:ring-2 focus:ring-green-500 outline-none'
+                                          value={status}
+                                          onChange={(e) => updateStatus(order?._id?.toString()!, e.target.value)}
+                                    >
+                                          {
+                                                statusOptions.map(st => (
+                                                      <option key={st} value={st}>{st.toUpperCase()}</option>
+                                                ))
+                                          }
+                                    </select>
+                              }
 
                         </div>
                   </div>

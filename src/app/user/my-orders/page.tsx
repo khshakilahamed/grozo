@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import UserOrderCard from "@/components/UserOrderCard";
+import { getSocket } from "@/lib/socket";
 
 const MyOrders = () => {
       const router = useRouter();
@@ -26,6 +27,15 @@ const MyOrders = () => {
             }
 
             getOrders();
+      }, []);
+
+      useEffect((): any => {
+            const socket = getSocket();
+            socket.on("order-assigned", ({ orderId, assignedDeliveryBoy }) => {
+                  setOrders((prev) => prev?.map(order => (order?._id == orderId ? { ...order, assignedDeliveryBoy } : order)))
+            });
+
+            return () => socket.off("order-assigned");
       }, []);
 
       if (loading) {

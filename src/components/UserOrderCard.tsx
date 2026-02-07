@@ -29,7 +29,7 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
       useEffect((): any => {
             const socket = getSocket();
             socket.on("order-status-update", (data) => {
-                  if (data?.orderId === String(order?._id)) {
+                  if (String(data?.orderId) === String(order?._id)) {
                         setStatus(data.status)
                   }
             });
@@ -52,19 +52,19 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                         </div>
                         {/* payment & Status*/}
                         <div className='flex flex-wrap items-center gap-2'>
-                              <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${order.isPaid
-                                    ? "bg-green-100 text-green-700 border-green-300"
-                                    : "bg-red-100 text-red-700 border-red-300"
-                                    }`}>
-                                    {
-                                          order.isPaid ? "Paid" : "Unpaid"
-                                    }
-                              </span>
+                              {
+                                    order.status !== "delivered" && <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${order.isPaid
+                                          ? "bg-green-100 text-green-700 border-green-300"
+                                          : "bg-red-100 text-red-700 border-red-300"
+                                          }`}>
+                                          {
+                                                order.isPaid ? "Paid" : "Unpaid"
+                                          }
+                                    </span>
+                              }
                               <span className={`px-3 py-1 text-xs font-semibold border rounded-full ${getStatusColor(status)}`}>{status}</span>
                         </div>
                   </div>
-
-
 
                   {/* Payment Method & Address*/}
                   <div className='p-5 space-y-4'>
@@ -81,7 +81,7 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                         )}
 
                         {
-                              order.assignedDeliveryBoy && <>
+                              order.assignedDeliveryBoy && status !== "delivered" && <>
                                     <div className='mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between'>
                                           <div className='flex items-center gap-3 text-sm text-gray-700'>
                                                 <UserCheck className='text-blue-600' size={18} />
@@ -103,8 +103,6 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
                               </>
 
                         }
-
-
 
                         <div className='flex items-center gap-2 text-gray-700 text-sm'>
                               <MapPin size={16} className='text-green-600' />

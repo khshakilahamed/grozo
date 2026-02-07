@@ -57,8 +57,8 @@ const userSchema = new mongoose.Schema<IUser>({
             },
             coordinates: {
                   type: [Number],
-                  // default: [0, 0], // [longitude, latitude]
-                  default: undefined, // [longitude, latitude]
+                  default: [0, 0], // [longitude, latitude]
+                  // default: undefined, // [longitude, latitude]
             }
       },
       socketId: {
