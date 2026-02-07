@@ -18,14 +18,8 @@ const DeliveryBoyDashboard = () => {
       const [assignments, setAssignments] = useState<IDeliveryAssignment[]>([]);
       const { userData } = useAppSelector((state) => state.user);
       const [activeOrder, setActiveOrder] = useState<any>(null);
-      const [userLocation, setUserLocation] = useState<ILocation>({
-            latitude: 0,
-            longitude: 0
-      });
-      const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation>({
-            latitude: 0,
-            longitude: 0
-      });
+      const [userLocation, setUserLocation] = useState<ILocation>({ latitude: 0, longitude: 0 });
+      const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<ILocation>({ latitude: 0, longitude: 0 });
       const [showOtpBox, setShowOtpBox] = useState(false);
       const [otp, setOtp] = useState("");
       const [otpError, setOtpError] = useState("");
