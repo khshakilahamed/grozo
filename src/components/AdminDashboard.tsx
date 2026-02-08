@@ -35,6 +35,23 @@ const AdminDashboard = async () => {
             { title: "Total Revenue", value: totalRevenue },
       ];
 
+      const chartData = [];
+
+      for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            date.setHours(0, 0, 0, 0);
+
+            const nextDay = new Date(date);
+            nextDay.setDate(date.getDate() + 1);
+
+            const ordersCount = orders.filter((o) => new Date(o.createdAt) >= date && new Date(o.createdAt) < nextDay)?.length;
+            chartData.push({
+                  day: date.toLocaleDateString("en-US", { weekday: "short" }),
+                  orders: ordersCount,
+            })
+      }
+
       return (
             <>
                   <AdminDashboardClient
@@ -46,6 +63,7 @@ const AdminDashboard = async () => {
                               }
                         }
                         stats={stats}
+                        chartData = {chartData}
                   />
             </>
       );

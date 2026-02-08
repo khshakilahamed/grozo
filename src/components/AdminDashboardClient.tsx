@@ -2,6 +2,7 @@
 import { DollarSign, Package, Truck, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 type PropType = {
       earning: {
@@ -12,10 +13,14 @@ type PropType = {
       stats: {
             title: string;
             value: number;
+      }[],
+      chartData: {
+            day: string;
+            orders: number;
       }[]
 }
 
-const AdminDashboardClient = ({ earning, stats }: PropType) => {
+const AdminDashboardClient = ({ earning, stats, chartData }: PropType) => {
       const [filter, setFilter] = useState<"today" | "sevenDays" | "total">();
 
       const currentEarning = filter === "today" ? earning.today : filter === "sevenDays" ? earning.sevenDays : earning.total;
@@ -62,8 +67,35 @@ const AdminDashboardClient = ({ earning, stats }: PropType) => {
                                     <DollarSign key="r" className="text-green-700 w-6 h-6" />,
                               ];
 
-                              return <motion.div></motion.div>
+                              return <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 20 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="bg-white border border-gray-100 shadow-md rounded-2xl p-5 flex items-center gap-4 hover:shadow-lg transition-all"
+                              >
+                                    <div className="bg-green-100 p-3 rounded-xl">
+                                          {icons[i]}
+                                    </div>
+                                    <div>
+                                          <p className="text-gray-600 text-sm">{s.title}</p>
+                                          <p>{s.value}</p>
+                                    </div>
+                              </motion.div>
                         })}
+                  </div>
+
+                  <div className="bg-white border border-gray-100 rounded-2xl shadow-md p-5 mb-10">
+                        <h2 className="text-lg font-semibold text-gray-700 mb-4">📈 Order Overview ( Last 7 Days )</h2>
+
+                        <ResponsiveContainer width={"100%"} height={300}>
+                              <BarChart data={chartData}>
+                                    <XAxis dataKey="day" stroke="#8884d8" />
+                                    <Tooltip />
+                                    <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                                    <Bar dataKey={"orders"} fill="#16A34A" radius={[6, 6, 0, 0]}/>
+                              </BarChart>
+                        </ResponsiveContainer>
                   </div>
             </div>
       );
