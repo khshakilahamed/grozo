@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useState } from "react";
 
-const categories = [
+export const categories = [
       "Fruits & Vegetables",
       "Dairy & Eggs",
       "Rice, Atta & Grains",
@@ -20,7 +20,7 @@ const categories = [
       "Baby & Pet Care"
 ];
 
-const units = ["kg", "g", "liter", "ml", "piece", "pack"]
+export const units = ["kg", "g", "liter", "ml", "piece", "pack"]
 
 const AddGrocery = () => {
       const [name, setName] = useState("");
