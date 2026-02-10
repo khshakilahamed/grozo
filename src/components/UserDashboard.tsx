@@ -4,10 +4,10 @@ import HeroSection from './HeroSection';
 import Grocery, { IGrocery } from '@/models/grocery.model';
 import GroceryItemCard from './GroceryItemCard';
 
-const UserDashboard = async () => {
+const UserDashboard = async ({ groceryList }: { groceryList: IGrocery[] }) => {
       await connectDb();
-      const groceries = await Grocery.find({}).lean();
-      const plainGroceries = JSON.parse(JSON.stringify(groceries));
+      // const groceries = await Grocery.find({}).lean();
+      const plainGroceries = JSON.parse(JSON.stringify(groceryList));
 
       return (
             <>
